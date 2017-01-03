@@ -43,6 +43,17 @@ PSModuleResource AzureExt
     MaximumVersion = '2.0.0.0'        
 }
 ````
+Installing modules into different scopes ('allusers'  or 'currentuser'). Default is 'allusers'
+````powershell
+PSModuleResource AzureExt
+{
+    Ensure = 'present'
+    Module_Name = 'AzureExt'
+    MinimumVersion = '1.0.0.0'
+    MaximumVersion = '2.0.0.0'
+    Scope = 'allusers'        
+}
+````
 
 ## More Info:
 Read http://www.david-obrien.net/?p=3108

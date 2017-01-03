@@ -3,6 +3,11 @@
     present
 }
 
+enum scope {
+    allusers
+    currentuser
+}
+
 [DscResource()]
 class PSModuleResource {
 
@@ -20,6 +25,9 @@ class PSModuleResource {
 
     [DscProperty(Mandatory=$false)]
     [string]$MaximumVersion
+
+    [DscProperty(Mandatory=$false)]
+    [scope]$InstallScope = [scope]::allusers
 
     [PSModuleResource] Get() {
         
@@ -56,6 +64,7 @@ class PSModuleResource {
                 $arguments = $this.GetVersionArguments()
                 $arguments.Add("-Name", $this.Module_Name)
                 $arguments.Add("-Force", $true)
+                $arguments.Add("-Scope", $this.InstallScope)
                 Install-Module @arguments
             }
             catch {
