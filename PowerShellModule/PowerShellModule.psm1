@@ -77,7 +77,7 @@ class PSModuleResource {
 
         $modules = @()
         $modules += @(Get-Module -Name $this.Module_Name -ListAvailable -ErrorAction Ignore)
-        $shouldApply = $false
+        $returnVal = $false
 
         Write-Verbose "The following versions of $($this.Module_Name) are installed"
         $modules | % {
@@ -100,7 +100,7 @@ class PSModuleResource {
         if ($this.RequiredVersion)
         {
             $modules | Where-Object { [System.Version]$_.Version -eq [System.Version]$this.RequiredVersion } | % {
-                $shouldApply = ($this.Ensure -eq 'present')
+                $returnVal = ($this.Ensure -eq 'present')
             }        
         }
 
@@ -108,21 +108,21 @@ class PSModuleResource {
         if ($this.MinimumVersion -and $this.MaximumVersion)
         {
             $modules | Where-Object { ([System.Version]$_.Version -ge [System.Version]$this.MinimumVersion) -and ([System.Version]$_.Version -le [System.Version]$this.MaximumVersion) } | % {
-                $shouldApply = ($this.Ensure -eq 'present')
+                $returnVal = ($this.Ensure -eq 'present')
             }
         }
         elseif ($this.MinimumVersion) {
             $modules | Where-Object { [System.Version]$_.Version -ge [System.Version]$this.MinimumVersion } | % {
-                $shouldApply = ($this.Ensure -eq 'present')
+                $returnVal = ($this.Ensure -eq 'present')
             }
         }
         elseif ($this.MaximumVersion) {
             $modules | Where-Object { [System.Version]$_.Version -le [System.Version]$this.MaximumVersion } | % {
-                $shouldApply = ($this.Ensure -eq 'present')
+                $returnVal = ($this.Ensure -eq 'present')
             }
         }
 
-        return $shouldApply
+        return $returnVal
     }
 
     [hashtable] GetVersionArguments() {
