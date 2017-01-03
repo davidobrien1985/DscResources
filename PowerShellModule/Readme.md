@@ -51,7 +51,7 @@ PSModuleResource AzureExt
     Module_Name = 'AzureExt'
     MinimumVersion = '1.0.0.0'
     MaximumVersion = '2.0.0.0'
-    Scope = 'allusers'        
+    InstallScope = 'allusers'        
 }
 ````
 
