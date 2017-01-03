@@ -24,6 +24,25 @@ Via Invoke-DscResource:
 ````powershell
 Invoke-DscResource -Name PSModuleResource -Method Set -ModuleName PowerShellModule -Property @{Ensure='absent';Module_Name='AzureExt'} -Verbose
 ````
+Using RequiredVersion
+````powershell
+PSModuleResource AzureExt
+{
+    Ensure = 'present'
+    Module_Name = 'AzureExt'
+    RequiredVersion = '1.0.0.0'        
+}
+````
+Using MinimumVersion and MaximumVersion (mutually exclusive to RequiredVersion)
+````powershell
+PSModuleResource AzureExt
+{
+    Ensure = 'present'
+    Module_Name = 'AzureExt'
+    MinimumVersion = '1.0.0.0'
+    MaximumVersion = '2.0.0.0'        
+}
+````
 
 ## More Info:
 Read http://www.david-obrien.net/?p=3108
