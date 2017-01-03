@@ -76,48 +76,53 @@ class PSModuleResource {
     [bool] Test() {
 
         $modules = @()
-        $modules += Get-Module -Name $this.Module_Name -ListAvailable -ErrorAction Ignore
-        
+        $modules += @(Get-Module -Name $this.Module_Name -ListAvailable -ErrorAction Ignore)
+        $shouldApply = $false
+
+        Write-Verbose "The following versions of $($this.Module_Name) are installed"
+        $modules | % {
+            Write-Verbose "Module: $($this.Module_Name), Version: $($_.Version)"
+        }
+
         # When no modules with that name were found
         if ($modules.Count -eq 0)
         {
-            return [bool]($this.Ensure -eq 'absent')
+            return ($this.Ensure -eq 'absent')
         }
 
         # We've found one or more matching modules, if neither RequiredVersion, MinimumVersion nor MaximumVersion is specified
         if ((-not $this.RequiredVersion) -and (-not $this.MinimumVersion) -and (-not $this.MaximumVersion))
         {
-            return [bool]($this.Ensure -eq 'present')
+            return ($this.Ensure -eq 'present')
         }
 
-        # We've found one or more modules, check RequiredVersion
+        # We've found one or more modules, check if RequiredVersion is set
         if ($this.RequiredVersion)
         {
             $modules | Where-Object { [System.Version]$_.Version -eq [System.Version]$this.RequiredVersion } | % {
-                return [bool]($this.Ensure -eq 'present')
+                $shouldApply = ($this.Ensure -eq 'present')
             }        
         }
 
-        # We've found one or more modules but RequiredVersion is not specified, eval MinimumVersion and MaximumVersion
+        # We've found one or more modules but RequiredVersion is not set, check MinimumVersion and MaximumVersion
         if ($this.MinimumVersion -and $this.MaximumVersion)
         {
             $modules | Where-Object { ([System.Version]$_.Version -ge [System.Version]$this.MinimumVersion) -and ([System.Version]$_.Version -le [System.Version]$this.MaximumVersion) } | % {
-                return [bool]($this.Ensure -eq 'present')
+                $shouldApply = ($this.Ensure -eq 'present')
             }
         }
         elseif ($this.MinimumVersion) {
             $modules | Where-Object { [System.Version]$_.Version -ge [System.Version]$this.MinimumVersion } | % {
-                return [bool]($this.Ensure -eq 'present')
+                $shouldApply = ($this.Ensure -eq 'present')
             }
         }
         elseif ($this.MaximumVersion) {
             $modules | Where-Object { [System.Version]$_.Version -le [System.Version]$this.MaximumVersion } | % {
-                return [bool]($this.Ensure -eq 'present')
+                $shouldApply = ($this.Ensure -eq 'present')
             }
         }
 
-        # When a condition above is not matched we're not up to date
-        return [bool]$false
+        return $shouldApply
     }
 
     [hashtable] GetVersionArguments() {
