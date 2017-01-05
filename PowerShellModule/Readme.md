@@ -56,4 +56,4 @@ PSModuleResource AzureExt
 ````
 
 ## More Info:
-Read http://www.david-obrien.net/?p=3108
+Read https://david-obrien.net/2015/09/powershell-dsc-to-manage-powershell-modules/
