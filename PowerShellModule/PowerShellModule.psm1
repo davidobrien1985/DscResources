@@ -51,8 +51,7 @@ class PSModuleResource {
         if ($this.Ensure -eq 'present') {
             try {
                 $arguments = $this.GetVersionArguments()
-                $arguments.Add("-Name", $this.Module_Name)
-                $arguments.Add("-ErrorAction", "Stop")
+                $arguments += @{"-Name" = $this.Module_Name; "-ErrorAction" = "Stop"}
                 Find-Module @arguments
             }
             catch {
@@ -62,9 +61,7 @@ class PSModuleResource {
 
             try {
                 $arguments = $this.GetVersionArguments()
-                $arguments.Add("-Name", $this.Module_Name)
-                $arguments.Add("-Force", $true)
-                $arguments.Add("-Scope", $this.InstallScope)
+                $arguments += @{"-Name" = $this.Module_Name; "-Force" = $true; "-Scope" = $this.InstallScope}
                 Install-Module @arguments
             }
             catch {
@@ -73,8 +70,7 @@ class PSModuleResource {
         }
         elseif ($this.Ensure -eq 'absent') {
             $arguments = $this.GetVersionArguments()
-            $arguments.Add("-Name", $this.Module_Name)
-            $arguments.Add("-Force", $true)
+            $arguments += @{"-Name" = $this.Module_Name; "-Force" = $true}
             Uninstall-Module @arguments
         }
         else {
