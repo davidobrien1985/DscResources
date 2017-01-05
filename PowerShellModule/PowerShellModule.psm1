@@ -85,8 +85,9 @@ class PSModuleResource {
         $returnVal = $false
 
         Write-Verbose "The following versions of $($this.Module_Name) are installed"
-        $modules | % {
-            Write-Verbose "Module: $($this.Module_Name), Version: $($_.Version)"
+        foreach ($module in $modules)
+        {
+            Write-Verbose "Module: $($this.Module_Name), Version: $($module.Version)"
         }
 
         # When no modules with that name were found
