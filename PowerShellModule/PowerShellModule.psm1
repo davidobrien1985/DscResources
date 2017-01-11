@@ -8,6 +8,12 @@ enum scope {
     currentuser
 }
 
+enum repositorytrust
+{
+    trusted
+    untrusted
+}
+
 [DscResource()]
 class PSModuleResource {
 
@@ -15,7 +21,7 @@ class PSModuleResource {
     [string]$Module_Name
 
     [DscProperty(Mandatory)]
-    [Ensure]$Ensure
+    [Ensure]$Ensure = [ensure]::present
 
     [DscProperty(Mandatory=$false)]
     [string]$RequiredVersion
@@ -28,6 +34,9 @@ class PSModuleResource {
 
     [DscProperty(Mandatory=$false)]
     [scope]$InstallScope = [scope]::allusers
+
+    [DscProperty(Mandatory=$false)]
+    [string]$RepositoryName = 'PSGallery'
 
     [PSModuleResource] Get() {
         
@@ -51,7 +60,7 @@ class PSModuleResource {
         if ($this.Ensure -eq 'present') {
             try {
                 $arguments = $this.GetVersionArguments()
-                $arguments += @{"-Name" = $this.Module_Name; "-ErrorAction" = "Stop"}
+                $arguments += @{"-Name" = $this.Module_Name; "-ErrorAction" = "Stop"; "-Repository" = $this.RepositoryName}
                 Find-Module @arguments
             }
             catch {
@@ -61,7 +70,7 @@ class PSModuleResource {
 
             try {
                 $arguments = $this.GetVersionArguments()
-                $arguments += @{"-Name" = $this.Module_Name; "-Force" = $true; "-Scope" = $this.InstallScope}
+                $arguments += @{"-Name" = $this.Module_Name; "-Force" = $true; "-Scope" = $this.InstallScope; "-Repository" = $this.RepositoryName}
                 Install-Module @arguments
             }
             catch {
@@ -74,7 +83,7 @@ class PSModuleResource {
             Uninstall-Module @arguments
         }
         else {
-            Write-Verbose -Message 'This should never be reached'
+            throw [System.ArgumentOutOfRangeException] "Value '$($this.Ensure)' of property Ensure is outside the range of allowed values"
         }
     }
 
@@ -155,5 +164,72 @@ class PSModuleResource {
             }            
         }
         return $versionArgs            
+    }
+}
+
+[DscResource()]
+class PSModuleRepositoryResource {
+
+    [DscProperty(Key)]
+    [string]$RepositoryName
+
+    [DscProperty(Mandatory)]
+    [Ensure]$Ensure = [ensure]::present
+
+    [DscProperty(Mandatory=$false)]
+    [string]$RepositoryInstallationPolicy = [repositorytrust]::untrusted
+
+    [DscProperty(Mandatory=$false)]
+    [string]$RepositorySourceLocation
+
+    [DscProperty(Mandatory=$false)]
+    [string]$RepositoryPublishLocation
+
+    [PSModuleRepositoryResource] Get() {
+        $state = [hashtable]::new()
+        $state.Module_Name = $this.RepositoryName
+        return [PSModuleRepositoryResource]$state
+    }
+
+    [void] Set() {
+
+        $repository = Get-PSRepository -Name $this.RepositoryName -ErrorAction Ignore
+
+        if ($this.Ensure -eq 'present')
+        {
+            if ($repository)
+            {
+                Set-PSRepository -Name $this.RepositoryName -SourceLocation $this.RepositorySourceLocation -PublishLocation $this.RepositoryPublishLocation -InstallationPolicy $this.RepositoryInstallationPolicy                
+            }
+            else {
+                Register-PSRepository -Name $this.RepositoryName -SourceLocation $this.RepositorySourceLocation -PublishLocation $this.RepositoryPublishLocation -InstallationPolicy $this.RepositoryInstallationPolicy
+            }
+        }
+        elseif ($this.Ensure -eq 'absent') {
+            Unregister-PSRepository -Name $this.RepositoryName
+        }
+        else {
+            throw [System.ArgumentOutOfRangeException] "Value '$($this.Ensure)' of property Ensure is outside the range of allowed values"
+        }
+    }
+
+    [bool] Test() {
+
+        $repository = Get-PSRepository -Name $this.RepositoryName -ErrorAction Ignore
+
+        if ($repository)
+        {
+            if ($this.Ensure -eq 'present')
+            {
+                if ($repository.InstallationPolicy -eq $this.RepositoryInstallationPolicy -and $repository.SourceLocation -eq $this.RepositorySourceLocation -and $repository.PublishLocation -eq $this.RepositoryPublishLocation)
+                {
+                    return $true
+                }
+            }
+            return $false
+        }
+        else {
+            return ($this.Ensure -eq 'absent')
+        }
     }
 }
