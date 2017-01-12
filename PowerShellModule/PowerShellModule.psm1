@@ -20,7 +20,7 @@ class PSModuleResource {
     [DscProperty(Key)]
     [string]$Module_Name
 
-    [DscProperty(Mandatory)]
+    [DscProperty(Mandatory=$false)]
     [Ensure]$Ensure = [ensure]::present
 
     [DscProperty(Mandatory=$false)]
@@ -173,13 +173,13 @@ class PSModuleRepositoryResource {
     [DscProperty(Key)]
     [string]$Name
 
-    [DscProperty(Mandatory)]
+    [DscProperty(Mandatory=$false)]
     [Ensure]$Ensure = [ensure]::present
 
     [DscProperty(Mandatory=$false)]
     [string]$InstallationPolicy = [installationpolicy]::untrusted
 
-    [DscProperty(Mandatory=$false)]
+    [DscProperty(Mandatory)]
     [string]$SourceLocation
 
     [DscProperty(Mandatory=$false)]
