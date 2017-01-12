@@ -235,7 +235,7 @@ class PSModuleRepositoryResource {
             return $false
         }
         else {
-            Write-Verbose "Could not find an existing repository with name '$($repository.Name)'"
+            Write-Verbose "Could not find an existing repository with name '$($this.Name)'"
             return ($this.Ensure -eq 'absent')
         }
     }
