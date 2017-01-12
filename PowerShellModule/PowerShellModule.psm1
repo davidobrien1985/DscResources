@@ -36,7 +36,7 @@ class PSModuleResource {
     [scope]$InstallScope = [scope]::allusers
 
     [DscProperty(Mandatory=$false)]
-    [string]$Name = 'PSGallery'
+    [string]$Repository = 'PSGallery'
 
     [PSModuleResource] Get() {
         
@@ -60,7 +60,7 @@ class PSModuleResource {
         if ($this.Ensure -eq 'present') {
             try {
                 $arguments = $this.GetVersionArguments()
-                $arguments += @{"-Name" = $this.Module_Name; "-ErrorAction" = "Stop"; "-Repository" = $this.RepositoryName}
+                $arguments += @{"-Name" = $this.Module_Name; "-ErrorAction" = "Stop"; "-Repository" = $this.Repository}
                 Find-Module @arguments
             }
             catch {
@@ -70,7 +70,7 @@ class PSModuleResource {
 
             try {
                 $arguments = $this.GetVersionArguments()
-                $arguments += @{"-Name" = $this.Module_Name; "-Force" = $true; "-Scope" = $this.InstallScope; "-Repository" = $this.RepositoryName}
+                $arguments += @{"-Name" = $this.Module_Name; "-Force" = $true; "-Scope" = $this.InstallScope; "-Repository" = $this.Repository}
                 Install-Module @arguments
             }
             catch {
@@ -187,7 +187,7 @@ class PSModuleRepositoryResource {
 
     [PSModuleRepositoryResource] Get() {
         $state = [hashtable]::new()
-        $state.Module_Name = $this.Name
+        $state.Name = $this.Name
         return [PSModuleRepositoryResource]$state
     }
 
@@ -202,7 +202,7 @@ class PSModuleRepositoryResource {
                 Set-PSRepository -Name $this.Name -SourceLocation $this.SourceLocation -PublishLocation $this.PublishLocation -InstallationPolicy $this.InstallationPolicy                
             }
             else {
-                Register-PSRepository -Name $this.RepositoryName -SourceLocation $this.SourceLocation -PublishLocation $this.PublishLocation -InstallationPolicy $this.InstallationPolicy
+                Register-PSRepository -Name $this.Name -SourceLocation $this.SourceLocation -PublishLocation $this.PublishLocation -InstallationPolicy $this.InstallationPolicy
             }
         }
         elseif ($this.Ensure -eq 'absent') {
@@ -221,7 +221,7 @@ class PSModuleRepositoryResource {
         {
             if ($this.Ensure -eq 'present')
             {
-                if ($repository.InstallationPolicy -eq $this.InstallationPolicy -and $repository.SourceLocation -eq $this.SourceLocation -and $repository.PublishLocation -eq $this.PublishLocation)
+                if (($repository.InstallationPolicy -eq $this.InstallationPolicy) -and ($repository.SourceLocation -eq $this.SourceLocation) -and ($repository.PublishLocation -eq $this.PublishLocation))
                 {
                     return $true
                 }

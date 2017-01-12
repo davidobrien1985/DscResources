@@ -12,7 +12,7 @@ It uses WMF 5 functionality (Find-Module, Install-Module, Uninstall-Module) to h
 - **`[String]` MinimumVersion** (_Write_) : The MinimumVersion of the module
 - **`[String]` MaximumVersion** (_Write_) : The MaximumVersion of the module
 - **`[String]` InstallScope** (_Write_) : The scope in which to install the module { *allusers* | currentuser }. Defaults to allusers
-- **`[String]` RepositoryName** (_Write_) : The name of a registered repository from which to download the module. Defaults to PSGallery. To register a new repository use the PSModuleRepositoryResource
+- **`[String]` Repository** (_Write_) : The name of a registered repository from which to download the module. Defaults to PSGallery. To register a new repository use the PSModuleRepositoryResource
 
 
 ### PSModuleRepositoryResource
