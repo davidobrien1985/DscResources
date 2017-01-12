@@ -197,12 +197,17 @@ class PSModuleRepositoryResource {
 
         if ($this.Ensure -eq 'present')
         {
+            $arguments = @{"-Name" = $this.Name; "-InstallationPolicy" = $this.InstallationPolicy; "-SourceLocation" = $this.SourceLocation}
+            if ($this.PublishLocation)
+            {
+                $arguments.Add("-PublishLocation", $this.PublishLocation)
+            }
             if ($repository)
             {
-                Set-PSRepository -Name $this.Name -SourceLocation $this.SourceLocation -PublishLocation $this.PublishLocation -InstallationPolicy $this.InstallationPolicy                
+                Set-PSRepository @arguments                
             }
             else {
-                Register-PSRepository -Name $this.Name -SourceLocation $this.SourceLocation -PublishLocation $this.PublishLocation -InstallationPolicy $this.InstallationPolicy
+                Register-PSRepository @arguments
             }
         }
         elseif ($this.Ensure -eq 'absent') {
