@@ -16,11 +16,11 @@ It uses WMF 5 functionality (Find-Module, Install-Module, Uninstall-Module) to h
 
 
 ### PSModuleRepositoryResource
-- **`[String]` RepositoryName** (_Key_): The name of the repository
+- **`[String]` Name** (_Key_): The name of the repository
 - **`[String]` Ensure** (_Write_): Ensure that the module is present or absent { *Present* | Absent }. Defaults to Present.
-- **`[String]` RepositoryInstallationPolicy** (_Write_): Whether the repository should be trusted or untrusted { Trusted | *Untrusted* }. Defaults to untrusted.
-- **`[String]` RepositorySourceLocation** (_Required_): The location from where modules should be downloaded
-- **`[String]` RepositoryPublishLocation** (_Write_): The location to where modules should be published
+- **`[String]` InstallationPolicy** (_Write_): Whether the repository should be trusted or untrusted { Trusted | *Untrusted* }. Defaults to untrusted.
+- **`[String]` SourceLocation** (_Required_): The location from where modules should be downloaded
+- **`[String]` PublishLocation** (_Write_): The location to where modules should be published
 
 # Usage:
 
@@ -78,9 +78,9 @@ Using a custom repository by depending on the repository resource
 PSModuleRepositoryResource CustomRepository
 {
     Ensure = 'present'
-    RepositoryName = 'MyCustomRepositoryName'
-    RepositoryPublishLocation = 'http://www.somelocation/publish'
-    RepositorySourceLocation = 'http://www.somelocation/src'
+    Name = 'MyCustomRepositoryName'
+    PublishLocation = 'http://www.somelocation/publish'
+    SourceLocation = 'http://www.somelocation/src'
 }
 PSModuleResource AzureExt
 {
