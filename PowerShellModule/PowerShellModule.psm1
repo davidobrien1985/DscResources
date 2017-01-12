@@ -188,6 +188,14 @@ class PSModuleRepositoryResource {
     [PSModuleRepositoryResource] Get() {
         $state = [hashtable]::new()
         $state.Name = $this.Name
+        $repository = Get-PSRepository -Name $this.Name -ErrorAction Ignore
+        if ($repository)
+        {
+            $state.Ensure = [ensure]::present
+        }
+        else {
+            $state.Ensure = [ensure]::absent
+        }
         return [PSModuleRepositoryResource]$state
     }
 
