@@ -211,7 +211,7 @@ class PSModuleRepositoryResource {
             }
         }
         elseif ($this.Ensure -eq 'absent') {
-            Unregister-PSRepository -Name $this.RepositoryName
+            Unregister-PSRepository -Name $this.Name
         }
         else {
             throw [System.ArgumentOutOfRangeException] "Value '$($this.Ensure)' of property Ensure is outside the range of allowed values"
@@ -220,7 +220,7 @@ class PSModuleRepositoryResource {
 
     [bool] Test() {
 
-        $repository = Get-PSRepository -Name $this.RepositoryName -ErrorAction Ignore
+        $repository = Get-PSRepository -Name $this.Name -ErrorAction Ignore
 
         if ($repository)
         {
