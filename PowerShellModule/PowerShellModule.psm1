@@ -224,6 +224,7 @@ class PSModuleRepositoryResource {
 
         if ($repository)
         {
+            Write-Verbose "Found existing repository with name '$($repository.Name)'"
             if ($this.Ensure -eq 'present')
             {
                 if (($repository.InstallationPolicy -eq $this.InstallationPolicy) -and ($repository.SourceLocation -eq $this.SourceLocation) -and ($repository.PublishLocation -eq $this.PublishLocation))
@@ -234,6 +235,7 @@ class PSModuleRepositoryResource {
             return $false
         }
         else {
+            Write-Verbose "Could not find an existing repository with name '$($repository.Name)'"
             return ($this.Ensure -eq 'absent')
         }
     }
