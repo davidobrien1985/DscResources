@@ -38,6 +38,9 @@ class PSModuleResource {
     [DscProperty(Mandatory=$false)]
     [string]$Repository = 'PSGallery'
 
+    [DscProperty(Mandatory=$false)]
+    [bool]$AllowClobber = $false
+
     [PSModuleResource] Get() {
         
         $state = [hashtable]::new()
@@ -71,6 +74,9 @@ class PSModuleResource {
             try {
                 $arguments = $this.GetVersionArguments()
                 $arguments += @{"-Name" = $this.Module_Name; "-Force" = $true; "-Scope" = $this.InstallScope; "-Repository" = $this.Repository}
+                if ($this.AllowClobber) {
+                    $arguments += @{"-AllowClobber" = $this.AllowClobber}
+                }
                 Install-Module @arguments
             }
             catch {
