@@ -41,8 +41,11 @@ class PSModuleResource {
     [DscProperty(Mandatory=$false)]
     [bool]$AllowClobber = $false
 
+    [DscProperty(Mandatory=$false)]
+    [pscredential]$Credential
+
     [PSModuleResource] Get() {
-        
+
         $state = [hashtable]::new()
         $state.Module_Name = $this.Module_Name
         $Module = Get-Module -Name $this.Module_Name -ListAvailable -ErrorAction Ignore
@@ -64,6 +67,9 @@ class PSModuleResource {
             try {
                 $arguments = $this.GetVersionArguments()
                 $arguments += @{"-Name" = $this.Module_Name; "-ErrorAction" = "Stop"; "-Repository" = $this.Repository}
+                if ($this.Credential) {
+                    $arguments += @{"-Credential" = $this.Credential}
+                }
                 Find-Module @arguments
             }
             catch {
@@ -76,6 +82,9 @@ class PSModuleResource {
                 $arguments += @{"-Name" = $this.Module_Name; "-Force" = $true; "-Scope" = $this.InstallScope; "-Repository" = $this.Repository}
                 if ($this.AllowClobber) {
                     $arguments += @{"-AllowClobber" = $this.AllowClobber}
+                }
+                if ($this.Credential) {
+                    $arguments += @{"-Credential" = $this.Credential}
                 }
                 Install-Module @arguments
             }
@@ -122,7 +131,7 @@ class PSModuleResource {
         {
             $modules | Where-Object { [System.Version]$_.Version -eq [System.Version]$this.RequiredVersion } | % {
                 $returnVal = ($this.Ensure -eq 'present')
-            }        
+            }
         }
 
         # We've found one or more modules but RequiredVersion is not set, check MinimumVersion and MaximumVersion
@@ -151,12 +160,12 @@ class PSModuleResource {
         if ($this.RequiredVersion -and ($this.MaximumVersion -or $this.MinimumVersion))
         {
             throw [System.ArgumentException] "The RequiredVersion argument is mutually exclusive to the MaximumVersion and MinimumVersion"
-        }        
+        }
 
         $versionArgs = [hashtable]::new()
 
         if ($this.RequiredVersion)
-        { 
+        {
             $versionArgs.Add("-RequiredVersion", $this.RequiredVersion)
         }
         else {
@@ -167,9 +176,9 @@ class PSModuleResource {
             if ($this.MaximumVersion)
             {
                 $versionArgs.Add("-MaximumVersion", $this.MaximumVersion)
-            }            
+            }
         }
-        return $versionArgs            
+        return $versionArgs
     }
 }
 
@@ -190,6 +199,9 @@ class PSModuleRepositoryResource {
 
     [DscProperty(Mandatory=$false)]
     [string]$PublishLocation
+
+    [DscProperty(Mandatory=$false)]
+    [pscredential]$Credential
 
     [PSModuleRepositoryResource] Get() {
         $state = [hashtable]::new()
@@ -216,9 +228,12 @@ class PSModuleRepositoryResource {
             {
                 $arguments.Add("-PublishLocation", $this.PublishLocation)
             }
+            if ($this.Credential) {
+                $arguments.Add("-Credential", $this.Credential)
+            }
             if ($repository)
             {
-                Set-PSRepository @arguments                
+                Set-PSRepository @arguments
             }
             else {
                 Register-PSRepository @arguments
